@@ -82,33 +82,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Wait for upstream images
-        run: |
-          TAG="${{ needs.build-s390x.outputs.tag }}"
-          MAX_ATTEMPTS=30
-          SLEEP_SECONDS=60
-
-          for ARCH in amd64 arm64; do
-            echo "Waiting for ${{ env.UPSTREAM_IMAGE }}:$TAG ($ARCH)..."
-            attempt=1
-
-            while [ $attempt -le $MAX_ATTEMPTS ]; do
-              if docker manifest inspect ${{ env.UPSTREAM_IMAGE }}:$TAG 2>/dev/null | grep -q "linux/$ARCH"; then
-                echo "Found $ARCH image"
-                break
-              fi
-
-              echo "Attempt $attempt/$MAX_ATTEMPTS: Image not ready, waiting ${SLEEP_SECONDS}s..."
-              sleep $SLEEP_SECONDS
-              attempt=$((attempt + 1))
-            done
-
-            if [ $attempt -gt $MAX_ATTEMPTS ]; then
-              echo "::error::Timeout waiting for $ARCH image after $((MAX_ATTEMPTS * SLEEP_SECONDS))s"
-              exit 1
-            fi
-          done
-
       - name: Pull and retag upstream images
         id: retag-images
         run: |
