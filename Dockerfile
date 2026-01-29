@@ -9,7 +9,7 @@ COPY --from=xx / /
 RUN apk add file make git clang lld patch
 ARG TARGETPLATFORM
 RUN set -x && \
-    xx-apk --no-cache add musl-dev gcc lld 
+    xx-apk --no-cache add musl-dev gcc 
 
 # Build the multus-dynamics-networks-controller project
 FROM base-builder AS multus-builder
